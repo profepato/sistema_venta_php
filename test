@@ -1,0 +1,14 @@
+# Listar los productos
+
+<?php
+require_once "model/Data.php";
+
+$d = new Data();
+
+$productos = $d->getProductos();
+
+foreach ($productos as $p) {
+    echo $p->id." - ".$p->nombre." - ". $p->precio . " - ". $p->stock;
+    echo "<br>";
+}
+?>
