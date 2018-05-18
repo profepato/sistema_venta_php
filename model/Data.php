@@ -84,58 +84,34 @@ class Data{
 
     public function crearVenta($listaProductos, $total){
         // crear la venta
-        $query = "INSERT INTO venta VALUES(NULL, now(), $total)";
+        $query = "CALL crearVenta($total)";
 
         $this->con->conectar();
         $this->con->ejecutar($query);
 
         // rescatar la última venta (id)
-        $query = "SELECT MAX(id) FROM venta";
+        /*$query = "SELECT getMaxIdVenta();";
         $rs = $this->con->ejecutar($query);
 
         $idUltimaVenta = 0;
         if($reg = $rs->fetch_array()){
             $idUltimaVenta = $reg[0];
-        }
-
-        //$this->con->desconectar();
+        }*/
         
         // los insert en el detalle
         foreach ($listaProductos as $p) {
-            //$this->con->conectar();
-            $query = "INSERT INTO detalle VALUES(NULL,
-            '".$idUltimaVenta."',
-            '".$p->id."',
-            '".$p->cantidad."',
-            '".$p->subTotal."')";
-
-            //echo $query;
+            $query = "CALL crearDetalle($p->id, $p->cantidad, $p->subTotal)";
 
             $this->con->ejecutar($query);
-            //$this->con->desconectar();
+            
             $this->actualizarStock($p->id, $p->cantidad);
         }
         $this->con->desconectar();
     }
 
     public function actualizarStock($id, $stockADescontar){
-        $query = "SELECT stock FROM producto WHERE id = $id";
-
-        //$this->con->conectar();
-        $rs = $this->con->ejecutar($query);
-
-        $stockActual = 0;
-        if($reg = $rs->fetch_array()){
-            $stockActual = $reg[0];
-        }
-
-        $stockActual -= $stockADescontar;
-
-        //$this->con->desconectar();
-        //$this->con->conectar();
-        $query = "UPDATE producto SET stock = $stockActual WHERE id = $id";
+        $query = "CALL actualizarStock($id, $stockADescontar)";
         $this->con->ejecutar($query);
-        //$this->con->desconectar();
     }
 
     /*
