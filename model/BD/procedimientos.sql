@@ -59,9 +59,13 @@ BEGIN
         cant_producto,
         sub_total
     );
-    
+
+    CALL actualizarStock(id_producto, cant_producto);
 END $$
 DELIMITER ;
+
+
+
 
 
 
@@ -75,6 +79,11 @@ BEGIN
     RETURN stProd;
 END $$
 DELIMITER ;
+
+
+
+
+
 
 
 DELIMITER $$

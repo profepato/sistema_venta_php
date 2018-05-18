@@ -83,37 +83,22 @@ class Data{
     }
 
     public function crearVenta($listaProductos, $total){
-        // crear la venta
         $query = "CALL crearVenta($total)";
 
         $this->con->conectar();
         $this->con->ejecutar($query);
 
-        // rescatar la última venta (id)
-        /*$query = "SELECT getMaxIdVenta();";
-        $rs = $this->con->ejecutar($query);
-
-        $idUltimaVenta = 0;
-        if($reg = $rs->fetch_array()){
-            $idUltimaVenta = $reg[0];
-        }*/
-        
-        // los insert en el detalle
         foreach ($listaProductos as $p) {
+            /*
+            En el procedimiento crearDetalle, se crea el detalle en la tabla
+            intermedia, y además se actualiza el stock en la tabla producto
+            */
             $query = "CALL crearDetalle($p->id, $p->cantidad, $p->subTotal)";
 
             $this->con->ejecutar($query);
-            
-            $this->actualizarStock($p->id, $p->cantidad);
         }
         $this->con->desconectar();
     }
-
-    public function actualizarStock($id, $stockADescontar){
-        $query = "CALL actualizarStock($id, $stockADescontar)";
-        $this->con->ejecutar($query);
-    }
-
     /*
     public function tieneStock($id, $stock){
         $query = "select stock from producto where id = $id";
