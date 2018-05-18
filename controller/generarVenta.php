@@ -10,9 +10,9 @@ $d = new Data();
 $d->crearVenta($carrito, $total);
 
 // remover el carrito de compra
-session_unset($carrito);
+unset($_SESSION["carrito"]);
 // remover el total
-session_unset($total);
+unset($_SESSION["total"]);
 // redirigir hacia index
 header("location: ../index.php");
 ?>
