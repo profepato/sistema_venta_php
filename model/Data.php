@@ -14,7 +14,7 @@ class Data{
     public function getProductos(){
         $productos = array();
 
-        $query = "SELECT * FROM producto";
+        $query = "SELECT * FROM getProductos";
 
         $this->con->conectar();
         $rs = $this->con->ejecutar($query);
@@ -38,7 +38,7 @@ class Data{
     public function getVentas(){
         $ventas = array();
 
-        $query = "SELECT * FROM venta";
+        $query = "SELECT * FROM getVentas";
 
         $this->con->conectar();
         $rs = $this->con->ejecutar($query);
@@ -59,10 +59,7 @@ class Data{
     }
 
     public function getDetalles($idVenta){
-        $query = "SELECT d.id, p.nombre, d.cantidad, d.subTotal, p.precio
-        FROM detalle d, producto p
-        WHERE d.producto = p.id AND
-        d.venta = $idVenta";
+        $query = "CALL getDetalles($idVenta)";
 
         $detalles = array();
         
