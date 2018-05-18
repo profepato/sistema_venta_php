@@ -8,16 +8,18 @@ class Data{
     private $con;
 
     public function __construct(){
-        $this->con = new Conexion("localhost", "ventas", "root", "123456");
+        $this->con = new Conexion("ventas");
     }
 
     public function getProductos(){
         $productos = array();
 
-        $query = "select * from producto";
-        $res = $this->con->ejecutar($query);
+        $query = "SELECT * FROM producto";
 
-        while($reg = mysql_fetch_array($res)){
+        $this->con->conectar();
+        $rs = $this->con->ejecutar($query);
+
+        while($reg = $rs->fetch_array()){
             $p = new Producto();
 
             $p->id = $reg[0];
@@ -28,16 +30,20 @@ class Data{
             array_push($productos, $p);
         }
 
+        $this->con->desconectar();
+
         return $productos;
     }
 
     public function getVentas(){
         $ventas = array();
 
-        $query = "select * from venta";
-        $res = $this->con->ejecutar($query);
+        $query = "SELECT * FROM venta";
 
-        while($reg = mysql_fetch_array($res)){
+        $this->con->conectar();
+        $rs = $this->con->ejecutar($query);
+
+        while($reg = $rs->fetch_array()){
             $v = new Venta();
 
             $v->id = $reg[0];
@@ -46,20 +52,23 @@ class Data{
 
             array_push($ventas, $v);
         }
+        $this->con->desconectar();
+
 
         return $ventas;
     }
 
     public function getDetalles($idVenta){
-        $query = "select d.id, p.nombre, d.cantidad, d.subTotal, p.precio
-        from detalle d, producto p
-        where d.producto = p.id and
+        $query = "SELECT d.id, p.nombre, d.cantidad, d.subTotal, p.precio
+        FROM detalle d, producto p
+        WHERE d.producto = p.id AND
         d.venta = $idVenta";
 
         $detalles = array();
-
-        $res = $this->con->ejecutar($query);
-        while($reg = mysql_fetch_array($res)){
+        
+        $this->con->conectar();
+        $rs = $this->con->ejecutar($query);
+        while($reg = $rs->fetch_array()){
             $d = new Detalle();
 
             $d->id = $reg[0];
@@ -71,50 +80,65 @@ class Data{
             array_push($detalles, $d);
         }
 
+        $this->con->desconectar();
+
         return $detalles;
     }
 
     public function crearVenta($listaProductos, $total){
         // crear la venta
-        $query = "insert into venta values(null, now(), $total)";
+        $query = "INSERT INTO venta VALUES(NULL, now(), $total)";
+
+        $this->con->conectar();
         $this->con->ejecutar($query);
 
         // rescatar la última venta (id)
-        $query = "select max(id) from venta";
-        $res = $this->con->ejecutar($query);
+        $query = "SELECT MAX(id) FROM venta";
+        $rs = $this->con->ejecutar($query);
 
         $idUltimaVenta = 0;
-        if($reg = mysql_fetch_array($res)){
+        if($reg = $rs->fetch_array()){
             $idUltimaVenta = $reg[0];
         }
 
+        //$this->con->desconectar();
+        
         // los insert en el detalle
         foreach ($listaProductos as $p) {
-            $query = "insert into detalle values(null,
+            //$this->con->conectar();
+            $query = "INSERT INTO detalle VALUES(NULL,
             '".$idUltimaVenta."',
             '".$p->id."',
             '".$p->cantidad."',
             '".$p->subTotal."')";
 
+            //echo $query;
+
             $this->con->ejecutar($query);
+            //$this->con->desconectar();
             $this->actualizarStock($p->id, $p->cantidad);
         }
-
+        $this->con->desconectar();
     }
 
     public function actualizarStock($id, $stockADescontar){
-        $query = "select stock from producto where id = $id";
-        $res = $this->con->ejecutar($query);
+        $query = "SELECT stock FROM producto WHERE id = $id";
+
+        //$this->con->conectar();
+        $rs = $this->con->ejecutar($query);
 
         $stockActual = 0;
-        if($reg = mysql_fetch_array($res)){
+        if($reg = $rs->fetch_array()){
             $stockActual = $reg[0];
         }
 
         $stockActual -= $stockADescontar;
 
-        $query = "update producto set stock = $stockActual where id = $id";
+        //$this->con->desconectar();
+        //$this->con->conectar();
+        $query = "UPDATE producto SET stock = $stockActual WHERE id = $id";
         $this->con->ejecutar($query);
+        //$this->con->desconectar();
     }
 
     /*

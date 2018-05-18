@@ -1,21 +1,36 @@
 <?php
 class Conexion{
-    public function __construct($server, $nameBD, $user, $pass){
-        $con = mysql_connect($server, $user, $pass);
+    private $mysql;
+    private $bdName;
+    private $user;
+    private $pass;
 
-        if(!$con){
-            die("Error al conectar: ".mysql_error());
-        }
+    public function __construct($bdName){
+        $this->bdName = $bdName;
+        $this->user = "root";
+        $this->pass = "123456";
+    }
 
-        $selBD = mysql_select_db($nameBD);
+    public function conectar(){
+        $this->mysql = new mysqli(
+            "localhost",
+            $this->user,
+            $this->pass,
+            $this->bdName
+        );
 
-        if(!$selBD){
-            die("Error al seleccionar la BD: ".mysql_error());
+        if (mysqli_connect_errno()) {
+            printf("Error de conexión: %s\n", mysqli_connect_error());
+            exit();
         }
     }
 
     public function ejecutar($query){
-        return mysql_query($query);
+        return $this->mysql->query($query);
+    }
+
+    public function desconectar(){
+        $this->mysql->close();
     }
 }
 ?>

@@ -36,6 +36,12 @@ select * from producto;
 select * from venta;
 select * from detalle;
 
+DELETE FROM detalle;
+DELETE FROM producto;
+DELETE FROM venta;
+
+DROP DATABASE ventas;
+
 /*1.- Ver detalle de venta a través de su ID*/
 select d.id, p.nombre, d.cantidad, d.subTotal, p.precio
 from detalle d, producto p
